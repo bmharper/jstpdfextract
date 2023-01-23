@@ -10,7 +10,8 @@ def text_before_references(txt):
     last_ref = -1
     for i, line in enumerate(lines):
         line = line.strip()
-        if (line.endswith("References.") or line.endswith("REFERENCES") or line.endswith("References") or line.endswith("REFERENCES.") or line.endswith("LITERATURE  CITED.")):
+        if (line.endswith("References.") or line.endswith("REFERENCES") or line.endswith("References") or line.endswith("REFERENCES.") or line.endswith("LITERATURE  CITED.")
+                or line.endswith("R E F E R E N C ES")):
             #if first_ref != -1:
             #    raise RuntimeError(f"Found duplicate reference section at line {first_ref} and {i}")
             if first_ref == -1:
@@ -20,6 +21,9 @@ def text_before_references(txt):
         raise RuntimeError("Failed to find reference section")
     return ' '.join(lines[:last_ref])
 
+def all_text(txt):
+    lines = txt.splitlines()
+    return ' '.join(lines)
 
 def main():
     with open('out.csv', 'w', encoding="utf-8") as outf:
@@ -38,7 +42,9 @@ def main():
             try:
                 words = text_before_references(txt)
             except RuntimeError as e:
-                print(f"Failed to extract text from {text_file}: {e}")
+                print(f"Failed to locate references section from {text_file}: {e}")
+                words = all_text(txt)
+                # To include files like these, comment out the following 'continue' line.
                 continue
             out.writerow([text_file.stem, words])
 
