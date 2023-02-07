@@ -21,13 +21,16 @@ def text_before_references(txt):
         raise RuntimeError("Failed to find reference section")
     return ' '.join(lines[:last_ref])
 
+
 def all_text(txt):
     lines = txt.splitlines()
     return ' '.join(lines)
 
+
 def main():
-    with open('out.csv', 'w', encoding="utf-8") as outf:
-        out = csv.writer(outf, quoting=csv.QUOTE_MINIMAL, escapechar='\\')
+    with open('everything.csv', 'w', encoding="utf-8", newline='') as outf:
+        outf.write('\ufeff')
+        out = csv.writer(outf, dialect='excel')
         out.writerow(['DOI', 'Abstract'])
         files = list(text_path.glob('*.txt'))
         files.sort()
@@ -41,6 +44,8 @@ def main():
             #txt = txt.replace(',', '.')
             try:
                 words = text_before_references(txt)
+                words = words.replace('\n', '')
+                words = words.replace('\r', '')
             except RuntimeError as e:
                 print(f"Failed to locate references section from {text_file}: {e}")
                 words = all_text(txt)
